@@ -14,7 +14,7 @@ ALL_SUBMISSIONS_CHECKED = 'All submissions checked.'
 CHECK_PAGE = 'Check page '
 USAGE = "usage: leetcodeDownloader.py username"
 
-SUBMISSION_URL = 'https://leetcode.com/api/submissions/my/'
+SUBMISSION_URL = 'https://leetcode.com/api/submissions/?offset='
 BASE_URL = 'https://leetcode.com'
 
 def downloadSubmission(session, name, file_type, URL):
@@ -26,7 +26,12 @@ def downloadSubmission(session, name, file_type, URL):
         return
     r = session.get(URL)
     code = re.search(r'submissionCode\:\ \'([^\']+)\'', r.content).group(1)
-    code = code.encode('utf8')
+
+    # address to possible UnicodeDecodeError for Chinese Characters
+    reload(sys)
+    sys.setdefaultencoding('utf8')
+
+    code = code.encode()
     s = json.loads('{"code": "%s"}' % code)
     print ADD_FILE + filename
     f = open(filename, 'w')
